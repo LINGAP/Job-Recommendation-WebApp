@@ -31,6 +31,7 @@ public class GitHubClient {
 			keyword = DEFAULT_KEYWORD;
 		}
 		try {
+			//encode to url perceived pattern
 			keyword = URLEncoder.encode(keyword,"UTF-8");
 		}catch(UnsupportedEncodingException e) {
 			e.printStackTrace();
