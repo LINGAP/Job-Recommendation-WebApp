@@ -8,13 +8,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import entity.item;
+import entity.Item;
 import recommendation.Recommendation;
 /**
  * Servlet implementation class RecommendItem
@@ -39,12 +36,7 @@ public class RecommendItem extends HttpServlet {
   		double lon = Double.parseDouble(request.getParameter("lon"));
 
   		Recommendation recommendation = new Recommendation();
-  		List<item> items = recommendation.recommendItems(userId, lat, lon);
-  		JSONArray array = new JSONArray();
-  		for (item item : items) {
-  			array.put(item.toJSONObject());
-  		}
-  		RpcHelper.writeJsonArray(response, array);	
+  		List<Item> Items = recommendation.recommendItems(userId, lat, lon);
 
   	}
 

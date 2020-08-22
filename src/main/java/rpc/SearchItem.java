@@ -9,15 +9,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import db.MySQLConnection;
-import entity.item;
+import entity.Item;
 import external.GitHubClient;
 
 /**
@@ -26,18 +22,7 @@ import external.GitHubClient;
 @WebServlet(name = "SearchServlet", urlPatterns = {"/search"})
 public class SearchItem extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public SearchItem() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 //		HttpSession session = request.getSession(false);
@@ -48,24 +33,16 @@ public class SearchItem extends HttpServlet {
 
 		String userId = request.getParameter("user_id");
 		double lat = Double.parseDouble(request.getParameter("lat"));
-		double lon = Double.parseDouble(request.getParameter("lon"));
+		double lon = Double.parseDouble(request.getParameter("long"));
 
 		GitHubClient client = new GitHubClient();
-		List<item> items = client.search(lat, lon, null);
+		List<Item> Items = client.search(lat, lon, null);
 
-		MySQLConnection connection = new MySQLConnection();
-		Set<String> favoritedItemIds = connection.getFavoriteItemIds(userId);
-		JSONArray array = new JSONArray();
-		for (item item : items) {
-			JSONObject obj = item.toJSONObject();
-			try {
-				obj.put("favorite", favoritedItemIds.contains(item.getItemId()));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			array.put(obj);
-		}
-		RpcHelper.writeJsonArray(response, array);
+		//MySQLConnection connection = new MySQLConnection();
+		//Set<String> favoritedItemIds = connection.getFavoriteItemIds(userId);
+
+		ObjectMapper mapper = new ObjectMapper();
+		response.getWriter().println(mapper.writeValueAsString(Items));
 	}
 
 

@@ -5,16 +5,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import entity.item;
-import entity.item.ItemBuilder;
+import entity.Item;
+import entity.Item.ItemBuilder;
 
 
 public class MySQLConnection {
@@ -64,12 +60,12 @@ public class MySQLConnection {
 		return favoriteItems;
 	}
 	
-	public Set<item> getFavoriteItems(String userId) {
+	public Set<Item> getFavoriteItems(String userId) {
 		if (conn == null) {
 			System.err.println("DB connection failed");
 			return new HashSet<>();
 		}
-		Set<item> favoriteItems = new HashSet<>();
+		Set<Item> favoriteItems = new HashSet<>();
 		Set<String> favoriteItemIds = getFavoriteItemIds(userId);
 
 		String sql = "SELECT * FROM items WHERE item_id = ?";
@@ -79,15 +75,15 @@ public class MySQLConnection {
 				statement.setString(1, itemId);
 				ResultSet rs = statement.executeQuery();
 
-				ItemBuilder builder = new ItemBuilder();
+				ItemBuilder itemBuilder = new ItemBuilder();
 				if (rs.next()) {
-					builder.setItemId(rs.getString("item_id"));
-					builder.setName(rs.getString("name"));
-					builder.setAddress(rs.getString("address"));
-					builder.setImageUrl(rs.getString("image_url"));
-					builder.setUrl(rs.getString("url"));
-					builder.setKeywords(getKeywords(itemId));
-					favoriteItems.add(builder.build());
+					itemBuilder.id(rs.getString("item_id"));
+					itemBuilder.title(rs.getString("name"));
+					itemBuilder.location(rs.getString("address"));
+					itemBuilder.companyLogo(rs.getString("image_url"));
+					itemBuilder.url(rs.getString("url"));
+					itemBuilder.setKeywords(getKeywords(itemId));
+					favoriteItems.add(itemBuilder.build());
 				}
 			}
 		} catch (SQLException e) {
@@ -119,7 +115,7 @@ public class MySQLConnection {
 
 
 	
-	public void setFavoriteItems(String userId, item item) {
+	public void setFavoriteItems(String userId, Item item) {
 		if (conn == null) {
 			System.err.println("DB connection failed");
 			return;
@@ -129,7 +125,7 @@ public class MySQLConnection {
 		try {
 			PreparedStatement statement = conn.prepareStatement(sql);
 			statement.setString(1, userId);
-			statement.setString(2, item.getItemId());
+			statement.setString(2, item.getId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -152,7 +148,7 @@ public class MySQLConnection {
 		}
 	}
 
-	public void saveItem(item item) {
+	public void saveItem(Item item) {
 		if (conn == null) {
 			System.err.println("DB connection failed");
 			return;
@@ -160,15 +156,15 @@ public class MySQLConnection {
 		String sql = "INSERT IGNORE INTO items VALUES (?, ?, ?, ?, ?)";
 		try {
 			PreparedStatement statement = conn.prepareStatement(sql);
-			statement.setString(1, item.getItemId());
-			statement.setString(2, item.getName());
-			statement.setString(3, item.getAddress());
-			statement.setString(4, item.getImageUrl());
+			statement.setString(1, item.getId());
+			statement.setString(2, item.getTitle());
+			statement.setString(3, item.getLocation());
+			statement.setString(4, item.getCompanyLogo());
 			statement.setString(5, item.getUrl());
 			statement.executeUpdate();
 			
 			sql = "INSERT IGNORE INTO keywords VALUES (?, ?)";
-			statement.setString(1, item.getItemId());
+			statement.setString(1, item.getId());
 			for (String keyword : item.getKeywords()) {
 				statement.setString(2, keyword);
 				statement.executeUpdate();

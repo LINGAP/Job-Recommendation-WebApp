@@ -12,7 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import db.MySQLConnection;
-import entity.item;
+import entity.Item;
 
 /**
  * Servlet implementation class ItemHistory
@@ -28,16 +28,8 @@ public class ItemHistory extends HttpServlet {
 		String userId = request.getParameter("user_id");
 		
 		MySQLConnection connection = new MySQLConnection();
-		Set<item> items = connection.getFavoriteItems(userId);
+		Set<Item> Items = connection.getFavoriteItems(userId);
 		connection.close();
-		
-		JSONArray array = new JSONArray();
-		for (item item : items) {
-			JSONObject obj = item.toJSONObject();
-			obj.put("favorite", true);
-			array.put(obj);
-		}
-		RpcHelper.writeJsonArray(response, array);
 	}
 
 	/**
@@ -48,7 +40,7 @@ public class ItemHistory extends HttpServlet {
 		MySQLConnection connection = new MySQLConnection();
 		JSONObject input = RpcHelper.readJSONObject(request);
 		String userId = input.getString("user_id");
-		item item = RpcHelper.parseFavoriteItem(input.getJSONObject("favorite"));
+		Item item = RpcHelper.parseFavoriteItem(input.getJSONObject("favorite"));
 		
 		connection.setFavoriteItems(userId, item);
 		connection.close();

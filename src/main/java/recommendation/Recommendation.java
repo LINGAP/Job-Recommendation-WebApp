@@ -11,13 +11,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import db.MySQLConnection;
-import entity.item;
+import entity.Item;
 import external.GitHubClient;
 
 public class Recommendation {
 
-	public List<item> recommendItems(String userId, double lat, double lon) {
-		List<item> recommendedItems = new ArrayList<>();
+	public List<Item> recommendItems(String userId, double lat, double lon) {
+		List<Item> recommendedItems = new ArrayList<>();
 
 		// Step 1, get all favorited itemids
 		MySQLConnection connection = new MySQLConnection();
@@ -49,12 +49,12 @@ public class Recommendation {
 		GitHubClient client = new GitHubClient();
 		
 		for (Entry<String, Integer> keyword : keywordList) {
-			List<item> items = client.search(lat, lon, keyword.getKey());
+			List<Item> Items = client.search(lat, lon, keyword.getKey());
 
-			for (item item : items) {
-				if (!favoritedItemIds.contains(item.getItemId()) && !visitedItemIds.contains(item.getItemId())) {
+			for (Item item : Items) {
+				if (!favoritedItemIds.contains(item.getId()) && !visitedItemIds.contains(item.getId())) {
 					recommendedItems.add(item);
-					visitedItemIds.add(item.getItemId());
+					visitedItemIds.add(item.getId());
 				}
 			}
 		}

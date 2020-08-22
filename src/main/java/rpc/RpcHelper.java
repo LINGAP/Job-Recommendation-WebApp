@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import entity.item;
-import entity.item.ItemBuilder;
+import entity.Item;
+import entity.Item.ItemBuilder;
 
 
 public class RpcHelper {
@@ -38,21 +38,21 @@ public class RpcHelper {
 	}
 
               // Convert a JSON object to Item object
-	public static item parseFavoriteItem(JSONObject favoriteItem) {
-		ItemBuilder builder = new ItemBuilder();
-		builder.setItemId(favoriteItem.getString("item_id"));
-		builder.setName(favoriteItem.getString("name"));
-		builder.setAddress(favoriteItem.getString("address"));
-		builder.setUrl(favoriteItem.getString("url"));
-		builder.setImageUrl(favoriteItem.getString("image_url"));
+	public static Item parseFavoriteItem(JSONObject favoriteItem) {
+		ItemBuilder itemBuilder = new ItemBuilder();
+		itemBuilder.id(favoriteItem.getString("item_id"));
+		itemBuilder.title(favoriteItem.getString("name"));
+		itemBuilder.location(favoriteItem.getString("address"));
+		itemBuilder.url(favoriteItem.getString("url"));
+		itemBuilder.companyLogo(favoriteItem.getString("image_url"));
 		
 		Set<String> keywords = new HashSet<>();
 		JSONArray array = favoriteItem.getJSONArray("keywords");
 		for (int i = 0; i < array.length(); ++i) {
 			keywords.add(array.getString(i));
 		}
-		builder.setKeywords(keywords);
-		return builder.build();
+		itemBuilder.setKeywords(keywords);
+		return itemBuilder.build();
 	}
 
 
