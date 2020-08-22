@@ -17,6 +17,7 @@ public class MySQLTableCreation {
 				return;
 			}
 			
+			// Step 2 Drop tables in case they exist.
 			Statement statement = conn.createStatement();
 			String sql = "DROP TABLE IF EXISTS keywords";
 			statement.executeUpdate(sql);

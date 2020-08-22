@@ -2,6 +2,7 @@ package external;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
@@ -51,7 +52,9 @@ public class GitHubClient {
 			}
 
 			ObjectMapper mapper = new ObjectMapper();
-			return Arrays.asList(mapper.readValue(entity.getContent(), Item[].class));//get a list to use in service
+			List<Item> items = Arrays.asList(mapper.readValue(entity.getContent(), Item[].class));//get a list to use in service
+			extractKeywords(items);
+			return items;
 		};
 
 		try {
@@ -62,46 +65,20 @@ public class GitHubClient {
 
 		return Collections.emptyList();
 	}
-	
-	private List<Item> getItemList(JSONArray array){
-		List<Item> itemList=new ArrayList<>();
-		List<String> descriptionList = new ArrayList<>();
-		
-		for(int i=0;i<array.length();i++) {
-			JSONObject obj=array.getJSONObject(i);
-			ItemBuilder itemBuilder =new ItemBuilder();
-			itemBuilder.id(obj.isNull("id")? "":obj.getString("id"));
-			itemBuilder.title(obj.isNull("title")? "":obj.getString("title"));
-			itemBuilder.location(obj.isNull("location")? "":obj.getString("location"));
-			itemBuilder.url(obj.isNull("url")? "":obj.getString("url"));
-			itemBuilder.companyLogo(obj.isNull("company_logo")? "":obj.getString("company_logo"));
-			
-			// We need to extract categories from description since GitHub API
-						// doesn't return keywords.
-			if (obj.getString("description").equals("\n")) {
-				descriptionList.add(obj.getString("title"));
-			} else {
-				descriptionList.add(obj.getString("description"));
-			}
-			
-			Item item = itemBuilder.build();
-			itemList.add(item);
-		}
 
-		// We need to get keywords from multiple text in one request since
-		// MonkeyLearnAPI has a limitation on request per minute.
-		String[] descriptionArray = descriptionList.toArray(new String[descriptionList.size()]); // Convert list to an array of the same type.
-		List<Set<String>> keywords = MonkeyLearnClient.extractKeywords(descriptionArray); // Call MonkeyLearn API.
-//		for (int i = 0; i < keywords.size(); ++i) {
-//			List<String> list = keywords.get(i);
-//
-//			Set<String> set = new HashSet<String>(list);
-//			itemList.get(i).setKeywords(set);
-//		}
-		
-		return itemList;
+	private void extractKeywords(List<Item> items) {
+
+		String[] descriptions = items.stream()
+				.map(Item::getDescription)
+				.toArray(String[]::new);
+
+		List<Set<String>> keywordList = MonkeyLearnClient.extractKeywords(descriptions);
+		for (int i = 0; i < items.size(); i++) {
+			items.get(i).setKeywords(keywordList.get(i));
+		}
 	}
-	
+
+
 	public static void main(String[] args) {
 		GitHubClient client = new GitHubClient();
 		List<Item> events = client.search(37.38, -122.08, null);
