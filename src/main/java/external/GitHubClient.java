@@ -91,13 +91,13 @@ public class GitHubClient {
 		// We need to get keywords from multiple text in one request since
 		// MonkeyLearnAPI has a limitation on request per minute.
 		String[] descriptionArray = descriptionList.toArray(new String[descriptionList.size()]); // Convert list to an array of the same type.
-		List<List<String>> keywords = MonkeyLearnClient.extractKeywords(descriptionArray); // Call MonkeyLearn API.
-		for (int i = 0; i < keywords.size(); ++i) {
-			List<String> list = keywords.get(i);
-			
-			Set<String> set = new HashSet<String>(list);
-			itemList.get(i).setKeywords(set);
-		}
+		List<Set<String>> keywords = MonkeyLearnClient.extractKeywords(descriptionArray); // Call MonkeyLearn API.
+//		for (int i = 0; i < keywords.size(); ++i) {
+//			List<String> list = keywords.get(i);
+//
+//			Set<String> set = new HashSet<String>(list);
+//			itemList.get(i).setKeywords(set);
+//		}
 		
 		return itemList;
 	}
