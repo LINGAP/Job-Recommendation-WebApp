@@ -2,8 +2,6 @@ package entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 public class ExtractRequestBody {
     public String[] data;
 

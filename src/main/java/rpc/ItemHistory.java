@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.util.Set;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import entity.HistoryRequestBody;
+import entity.ResultResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,6 +21,7 @@ import entity.Item;
 /**
  * Servlet implementation class ItemHistory
  */
+@WebServlet(name = "HistoryServlet", urlPatterns = {"/history"})
 public class ItemHistory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -36,30 +41,33 @@ public class ItemHistory extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		response.setContentType("application/json");
+		ObjectMapper mapper = new ObjectMapper();
+		HistoryRequestBody body = mapper.readValue(request.getReader(), HistoryRequestBody.class);
+
 		MySQLConnection connection = new MySQLConnection();
-		JSONObject input = RpcHelper.readJSONObject(request);
-		String userId = input.getString("user_id");
-		Item item = RpcHelper.parseFavoriteItem(input.getJSONObject("favorite"));
-		
-		connection.setFavoriteItems(userId, item);
+		connection.setFavoriteItems(body.userId, body.favorite);
 		connection.close();
-		RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
+
+		ResultResponse resultResponse = new ResultResponse("SUCCESS");
+		mapper.writeValue(response.getWriter(), resultResponse);
 	}
 
 	/**
 	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("application/json");
+		ObjectMapper mapper = new ObjectMapper();
+
+		HistoryRequestBody body = mapper.readValue(request.getReader(), HistoryRequestBody.class);
+
 		MySQLConnection connection = new MySQLConnection();
-		JSONObject input = RpcHelper.readJSONObject(request);
-		String userId = input.getString("user_id");
-		//item item = RpcHelper.parseFavoriteItem(input.getJSONObject("favorite"));
-		
-		//connection.unsetFavoriteItems(userId, item.getItemId());
-		connection.unsetFavoriteItems(userId, input.getJSONObject("favorite").getString("item_id"));
+		connection.unsetFavoriteItems(body.userId, body.favorite.getId());
 		connection.close();
-		RpcHelper.writeJsonObject(response, new JSONObject().put("result", "SUCCESS"));
+
+		ResultResponse resultResponse = new ResultResponse("SUCCESS");
+		mapper.writeValue(response.getWriter(), resultResponse);
 
 	}
 

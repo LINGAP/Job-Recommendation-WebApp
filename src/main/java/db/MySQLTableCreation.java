@@ -10,13 +10,13 @@ public class MySQLTableCreation {
 		try {
 			// Step 1 Connect to MySQL.
 			System.out.println("Connecting to " + MySQLDBUtil.URL);
-			Class.forName("com.mysql.cj.jdbc.Driver").getConstructor().newInstance();
+			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 			Connection conn = DriverManager.getConnection(MySQLDBUtil.URL);
 			
 			if (conn == null) {
 				return;
 			}
-			
+
 			// Step 2 Drop tables in case they exist.
 			Statement statement = conn.createStatement();
 			String sql = "DROP TABLE IF EXISTS keywords";
