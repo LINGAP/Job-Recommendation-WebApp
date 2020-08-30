@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.sql.ResultSet;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +40,7 @@ public class MySQLConnection {
 	public Set<String> getFavoriteItemIds(String userId) {
 		if (conn == null) {
 			System.err.println("DB connection failed");
-			return new HashSet<>();
+			return Collections.emptySet();
 		}
 
 		Set<String> favoriteItems = new HashSet<>();
@@ -77,12 +78,13 @@ public class MySQLConnection {
 
 				ItemBuilder itemBuilder = new ItemBuilder();
 				if (rs.next()) {
-					itemBuilder.id(rs.getString("item_id"));
-					itemBuilder.title(rs.getString("name"));
-					itemBuilder.location(rs.getString("address"));
-					itemBuilder.companyLogo(rs.getString("image_url"));
-					itemBuilder.url(rs.getString("url"));
-					itemBuilder.setKeywords(getKeywords(itemId));
+					itemBuilder
+							.id(rs.getString("item_id"))
+							.title(rs.getString("name"))
+							.location(rs.getString("address"))
+							.companyLogo(rs.getString("image_url"))
+							.url(rs.getString("url"))
+							.setKeywords(getKeywords(itemId));
 					favoriteItems.add(itemBuilder.build());
 				}
 			}
@@ -95,7 +97,7 @@ public class MySQLConnection {
 	public Set<String> getKeywords(String itemId) {
 		if (conn == null) {
 			System.err.println("DB connection failed");
-			return null;
+				return Collections.emptySet();
 		}
 		Set<String> keywords = new HashSet<>();
 		String sql = "SELECT keyword from keywords WHERE item_id = ? ";

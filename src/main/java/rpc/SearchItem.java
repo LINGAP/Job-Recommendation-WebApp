@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,11 +26,11 @@ public class SearchItem extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-//		HttpSession session = request.getSession(false);
-//		if (session == null) {
-//			response.setStatus(403);
-//			return;
-//		}
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			response.setStatus(403);
+			return;
+		}
 
 		String userId = request.getParameter("user_id");
 		double lat = Double.parseDouble(request.getParameter("lat"));
@@ -38,8 +39,13 @@ public class SearchItem extends HttpServlet {
 		GitHubClient client = new GitHubClient();
 		List<Item> Items = client.search(lat, lon, null);
 
-		//MySQLConnection connection = new MySQLConnection();
-		//Set<String> favoritedItemIds = connection.getFavoriteItemIds(userId);
+		MySQLConnection connection = new MySQLConnection();
+		Set<String> favoriteItemIds = connection.getFavoriteItemIds(userId);
+		connection.close();
+
+		for (Item item:Items){
+			item.setFavorite(favoriteItemIds.contains(item.getId()));
+		}
 
 		ObjectMapper mapper = new ObjectMapper();
 		response.getWriter().println(mapper.writeValueAsString(Items));

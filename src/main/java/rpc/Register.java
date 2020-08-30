@@ -3,10 +3,14 @@ package rpc;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import entity.RegisterRequestBody;
+import entity.ResultResponse;
 import org.json.JSONObject;
 
 import db.MySQLConnection;
@@ -14,8 +18,8 @@ import db.MySQLConnection;
 /**
  * Servlet implementation class Register
  */
+@WebServlet(name = "RegisterServlet", urlPatterns = "/register")
 public class Register extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,21 +33,19 @@ public class Register extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		JSONObject input = RpcHelper.readJSONObject(request);
-		String userId = input.getString("user_id");
-		String password = input.getString("password");
-		String firstname = input.getString("first_name");
-		String lastname = input.getString("last_name");
+		ObjectMapper mapper = new ObjectMapper();
+		RegisterRequestBody body = mapper.readValue(request.getReader(), RegisterRequestBody.class);
 
 		MySQLConnection connection = new MySQLConnection();
-		JSONObject obj = new JSONObject();
-		if (connection.addUser(userId, password, firstname, lastname)) {
-			obj.put("status", "OK");
+		ResultResponse resultResponse;
+		if (connection.addUser(body.userId, body.password, body.firstName, body.lastName)) {
+			resultResponse = new ResultResponse("OK");
 		} else {
-			obj.put("status", "User Already Exists");
+			resultResponse = new ResultResponse( "User Already Exists");
 		}
 		connection.close();
-		RpcHelper.writeJsonObject(response, obj);
+		response.setContentType("application/json");
+		mapper.writeValue(response.getWriter(),resultResponse);
 	}
 
 }

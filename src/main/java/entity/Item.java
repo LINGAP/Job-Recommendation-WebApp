@@ -18,16 +18,6 @@ public class Item {
 	private Set<String> keywords;
 
 	private boolean favorite;
-	
-	private Item() {
-//		this.id = builder.id;
-//		this.title = builder.title;
-//		this.location = builder.location;
-//		this.companyLogo = builder.companyLogo;
-//		this.url = builder.url;
-//		this.keywords = builder.keywords;
-//		this.description = builder.description;
-	}
 
 	public boolean isFavorite() {
 		return favorite;

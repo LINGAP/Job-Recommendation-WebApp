@@ -8,12 +8,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.HistoryRequestBody;
 import entity.ResultResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import db.MySQLConnection;
 import entity.Item;
@@ -29,18 +28,30 @@ public class ItemHistory extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			response.setStatus(403);
+			return;
+		}
+		ObjectMapper mapper = new ObjectMapper();
 		String userId = request.getParameter("user_id");
 		
 		MySQLConnection connection = new MySQLConnection();
 		Set<Item> Items = connection.getFavoriteItems(userId);
 		connection.close();
+
+		mapper.writeValue(response.getWriter(),Items);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			response.setStatus(403);
+			return;
+		}
 		response.setContentType("application/json");
 		ObjectMapper mapper = new ObjectMapper();
 		HistoryRequestBody body = mapper.readValue(request.getReader(), HistoryRequestBody.class);
