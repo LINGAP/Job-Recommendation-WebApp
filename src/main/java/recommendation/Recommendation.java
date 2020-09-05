@@ -19,14 +19,14 @@ public class Recommendation {
 	public List<Item> recommendItems(String userId, double lat, double lon) {
 		List<Item> recommendedItems = new ArrayList<>();
 
-		// Step 1, get all favorited itemids
+		// Step 1, get all favorite itemIds
 		MySQLConnection connection = new MySQLConnection();
-		Set<String> favoritedItemIds = connection.getFavoriteItemIds(userId);
+		Set<String> favoriteItemIds = connection.getFavoriteItemIds(userId);
 
 		// Step 2, get all categories, sort by count
 		// {"software engineer": 6, "backend": 4, "san francisco": 3, "remote": 1}
 		Map<String, Integer> allKeywords = new HashMap<>();
-		for (String itemId : favoritedItemIds) {
+		for (String itemId : favoriteItemIds) {
 			Set<String> keywords = connection.getKeywords(itemId);
 			for (String keyword : keywords) {
 				allKeywords.put(keyword, allKeywords.getOrDefault(keyword, 0) + 1);
@@ -52,7 +52,7 @@ public class Recommendation {
 			List<Item> Items = client.search(lat, lon, keyword.getKey());
 
 			for (Item item : Items) {
-				if (!favoritedItemIds.contains(item.getId()) && !visitedItemIds.contains(item.getId())) {
+				if (!favoriteItemIds.contains(item.getId()) && !visitedItemIds.contains(item.getId())) {
 					recommendedItems.add(item);
 					visitedItemIds.add(item.getId());
 				}

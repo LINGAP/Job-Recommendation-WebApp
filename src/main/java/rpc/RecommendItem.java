@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 
 import entity.Item;
@@ -19,7 +20,6 @@ import recommendation.Recommendation;
  */
 @WebServlet(name = "RecommendationServlet", urlPatterns = {"/recommendation"})
 public class RecommendItem extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,7 +31,7 @@ public class RecommendItem extends HttpServlet {
   			response.setStatus(403);
   			return;
   		}
-  		String userId = request.getParameter("user_id");
+  		String userId = session.getAttribute("user_id").toString();
 
   		double lat = Double.parseDouble(request.getParameter("lat"));
   		double lon = Double.parseDouble(request.getParameter("lon"));
@@ -39,6 +39,8 @@ public class RecommendItem extends HttpServlet {
   		Recommendation recommendation = new Recommendation();
   		List<Item> Items = recommendation.recommendItems(userId, lat, lon);
 
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(response.getWriter(),Items);
   	}
 
 	/**
