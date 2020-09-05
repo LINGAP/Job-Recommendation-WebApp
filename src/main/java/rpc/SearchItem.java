@@ -22,7 +22,6 @@ import external.GitHubClient;
  */
 @WebServlet(name = "SearchServlet", urlPatterns = {"/search"})
 public class SearchItem extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -34,7 +33,7 @@ public class SearchItem extends HttpServlet {
 
 		String userId = request.getParameter("user_id");
 		double lat = Double.parseDouble(request.getParameter("lat"));
-		double lon = Double.parseDouble(request.getParameter("long"));
+		double lon = Double.parseDouble(request.getParameter("lon"));
 
 		GitHubClient client = new GitHubClient();
 		List<Item> Items = client.search(lat, lon, null);

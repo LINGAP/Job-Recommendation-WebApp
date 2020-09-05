@@ -166,6 +166,7 @@ public class MySQLConnection {
 			statement.executeUpdate();
 			
 			sql = "INSERT IGNORE INTO keywords VALUES (?, ?)";
+			statement = conn.prepareStatement(sql);
 			statement.setString(1, item.getId());
 			for (String keyword : item.getKeywords()) {
 				statement.setString(2, keyword);
@@ -229,7 +230,6 @@ public class MySQLConnection {
 			statement.setString(2, password);
 			statement.setString(3, firstname);
 			statement.setString(4, lastname);
-
 			return statement.executeUpdate() == 1;
 		} catch (SQLException e) {
 			e.printStackTrace();

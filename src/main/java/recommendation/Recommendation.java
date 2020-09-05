@@ -50,11 +50,12 @@ public class Recommendation {
 		
 		for (Entry<String, Integer> keyword : keywordList) {
 			List<Item> Items = client.search(lat, lon, keyword.getKey());
-
 			for (Item item : Items) {
+				System.out.println(item);
 				if (!favoriteItemIds.contains(item.getId()) && !visitedItemIds.contains(item.getId())) {
 					recommendedItems.add(item);
 					visitedItemIds.add(item.getId());
+					System.out.println("added");
 				}
 			}
 		}
